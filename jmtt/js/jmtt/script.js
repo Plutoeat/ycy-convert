@@ -55,15 +55,15 @@ function onImageLoaded(e, t, r, aid) {
   }
 }
 
-var img_src = window.location.href.split("?")[1].split("=")[1];
-var r = img_src.split("/")[6].split(".")[0];
-var aid = img_src.split("/")[5];
-var image = document.querySelector(".input");
-var canvas = document.querySelector("canvas");
-var target = document.querySelector(".target");
-image.src = img_src;
-image.crossOrigin = "*";
 document.querySelector(".input").onload = function () {
+  var img_src = window.location.href.split("?")[1].split("=")[1];
+  var r = img_src.split("/")[6].split(".")[0];
+  var aid = img_src.split("/")[5];
+  var image = document.querySelector(".input");
+  var canvas = document.querySelector("canvas");
+  var target = document.querySelector(".target");
+  image.src = img_src;
+  image.crossOrigin = "*";
   onImageLoaded(image, canvas, r, aid);
   target.src = canvas.toDataURL("image/png");
   image.style.display = "none";
