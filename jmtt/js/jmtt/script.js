@@ -55,20 +55,67 @@ function onImageLoaded(e, t, r, aid) {
   }
 }
 
+function dataURLtoBlob(dataurl) {
+  var arr = dataurl.split(','),
+  mime = arr[0].match(/:(.*?);/)[1],
+     bstr = atob(arr[1]),
+     n = bstr.length,
+     u8arr = new Uint8Array(n);
+ while (n--) {
+     u8arr[n] = bstr.charCodeAt(n);
+ }
+ return new Blob([u8arr], { type: mime });
+}
+
 window.onload = function () {
-  var img_src = window.location.href.split("?")[1].split("=")[1];
-  var r = img_src.split("/")[6].split(".")[0];
+  var img_src = window.location.href.split("?")[1].split("&")[0].split("=")[1];
+  var myaccessKeyId = window.location.href
+    .split("?")[1]
+    .split("&")[1]
+    .split("=")[1];
+  var myaccessKeySecret = window.location.href
+    .split("?")[1]
+    .split("&")[2]
+    .split("=")[1];
   var aid = img_src.split("/")[5];
+  var r = img_src.split("/")[6].split(".")[0];
   var image = document.querySelector(".input");
   var canvas = document.querySelector("canvas");
-  var target = document.querySelector(".target");
+  var pathname = aid+'/'+r+'.png';
   image.src = img_src;
   image.crossOrigin = "*";
+  const client = new OSS({
+    // yourRegion填写Bucket所在地域。以华东1（杭州）为例，Region填写为oss-cn-hangzhou。
+    region: "oss-cn-chengdu",
+    // 从STS服务获取的临时访问密钥（AccessKey ID和AccessKey Secret）。
+    accessKeyId: myaccessKeyId,
+    accessKeySecret: myaccessKeySecret,
+    // 填写Bucket名称。
+    bucket: "jmtt",
+  });
+  async function putObject(pathname, data) {
+    try {
+      // 填写Object完整路径。Object完整路径中不能包含Bucket名称。
+      // 您可以通过自定义文件名（例如exampleobject.txt）或文件完整路径（例如exampledir/exampleobject.txt）的形式实现将数据上传到当前Bucket或Bucket中的指定目录。
+      // data对象可以自定义为file对象、Blob数据或者OSS Buffer。
+      const result = await client.put(
+        pathname,
+        data
+        //{headers}
+      );
+      console.log(result);
+    } catch (e) {
+      console.log(e);
+    }
+  }
   image.onload = function () {
     onImageLoaded(image, canvas, r, aid);
-    target.src = canvas.toDataURL("image/png");
-    image.style.display = "none";
-    canvas.style.display = "none";
-    // target.style.display = "none";
+    const blob = dataURLtoBlob(canvas.toDataURL("image/png"));
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(blob);
+    reader.onload=function(event){
+      const buffer = new OSS.Buffer(event.target.result);
+      putObject(pathname, buffer);
+    }
   };
 };
