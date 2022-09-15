@@ -12,5 +12,10 @@
 <body>
     <img class="input" src="" alt="input">
     <canvas></canvas>
+    <script>
+        document.querySelector('canvas').onchange=function () {
+            putObject(pathname, buffer);
+        }
+    </script>
 </body>
 </html>

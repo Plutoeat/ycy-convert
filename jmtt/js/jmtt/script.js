@@ -115,7 +115,7 @@ window.onload = function () {
     reader.readAsArrayBuffer(blob);
     reader.onload=function(event){
       const buffer = new OSS.Buffer(event.target.result);
-      putObject(pathname, buffer);
+      // putObject(pathname, buffer);
     }
   };
 };
